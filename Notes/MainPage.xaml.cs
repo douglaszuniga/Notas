@@ -11,14 +11,14 @@ namespace Notes
         public MainPage()
         {
             InitializeComponent();
-            Loaded += MainPageLoaded;
+            //Loaded += MainPageLoaded;
         }
 
-        void MainPageLoaded(object sender, System.Windows.RoutedEventArgs e)
-        {
-            var collection = Resources["noteCollection"] as NoteCollection;
-            if (collection != null) collection.Load();
-        }
+        //void MainPageLoaded(object sender, System.Windows.RoutedEventArgs e)
+        //{
+        //    var collection = Resources["noteCollection"] as NoteCollection;
+        //    if (collection != null) collection.UpdateNoteCollection();
+        //}
 
         private void ApplicationBarIconButtonClick(object sender, EventArgs e)
         {
@@ -48,6 +48,8 @@ namespace Notes
             var applicationBarIconButton = ApplicationBar.Buttons[1] as ApplicationBarIconButton;
             if (applicationBarIconButton != null)
                 applicationBarIconButton.IsEnabled = false;
+            var collection = Resources["noteCollection"] as NoteCollection;
+            if (collection != null) collection.UpdateNoteCollection();
         }
 
         private void LbNotesSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)

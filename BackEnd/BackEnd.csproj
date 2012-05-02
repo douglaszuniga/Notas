@@ -53,6 +53,7 @@
     <Compile Include="Note.cs" />
     <Compile Include="NoteCollection.cs" />
     <Compile Include="NoteDataContext.cs" />
+    <Compile Include="PersistenceManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />

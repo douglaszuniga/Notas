@@ -1,66 +1,44 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
+using System.ComponentModel;
 
 namespace BackEnd
 {
-    public class NoteCollection
+    public class NoteCollection : INotifyPropertyChanged
     {
-        public static ObservableCollection<Note> Notes { get; set; }
+        private ObservableCollection<Note> _notes;
+        public ObservableCollection<Note> Notes
+        {
+            get { return _notes; }
+            set
+            {
+                _notes = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Notes"));
+                }
+            }
+        }
+
+        public PersistenceManager Manager { get; set; }
 
         public NoteCollection()
         {
-            Notes = new ObservableCollection<Note>();
-            Load();
+            if (Notes == null)
+            {
+                Notes = new ObservableCollection<Note>();    
+            }
+            if (Manager == null)
+            {
+                Manager = new PersistenceManager();
+            }
+            UpdateNoteCollection();
         }
 
-        public void Update(Note note)
+        public void UpdateNoteCollection()
         {
-            var result = Notes.Single(x => x.Id == note.Id);
-            result.Content = note.Content;
-            result.Title = note.Title;
-
-            var updatedNote = (from c in NoteDataContext.Current.Notes
-                              where c.Id == note.Id
-                              select c).First();
-            
-            updatedNote.Title = note.Title;
-            updatedNote.Content = note.Content;
-            
-            NoteDataContext.Current.SubmitChanges();
+            Notes = new ObservableCollection<Note>(Manager.Load());
         }
 
-        public void Add(Note note)
-        {
-            Notes.Add(note);
-
-            NoteDataContext.Current.Notes.InsertOnSubmit(note);
-            NoteDataContext.Current.SubmitChanges();
-
-            Load();
-        }
-
-        public void Load()
-        {
-            var query = from selectedNote in NoteDataContext.Current.Notes
-                        orderby selectedNote.Id
-                        select selectedNote;
-
-            Notes =  new ObservableCollection<Note>(query.ToList());
-        }
-
-        public void Delete(Note note)
-        {
-            Notes.Remove(note);
-
-            NoteDataContext.Current.Notes.DeleteOnSubmit(note);
-            NoteDataContext.Current.SubmitChanges();
-        }
-
-        public Note Retrieve(int id)
-        {
-            return (from c in NoteDataContext.Current.Notes
-                    where c.Id == id
-                    select c).First();
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

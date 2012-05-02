@@ -11,12 +11,12 @@ namespace Notes
     {
         private bool _isEditMode;
         private Note _currentNote;
-        private readonly NoteCollection _collection;
+        private readonly PersistenceManager _manager;
 
         public Edit()
         {
             InitializeComponent();
-            _collection = new NoteCollection();
+            _manager = new PersistenceManager();
             Loaded += EditLoaded;
         }
 
@@ -45,19 +45,19 @@ namespace Notes
 
         private void ApplicationBarSaveIconButtonClick(object sender, EventArgs e)
         {
-            if (_collection != null)
+            if (_manager != null)
                 if (_isEditMode)
                 {
                     _currentNote.Title = tbTitle.Text;
                     _currentNote.Content = tbContent.Text;
 
-                    _collection.Update(_currentNote);    
+                    _manager.Update(_currentNote);    
                 }
                 else
                 {
                     _currentNote = new Note {Title = tbTitle.Text, Content = tbContent.Text};
 
-                    _collection.Add(_currentNote);
+                    _manager.Add(_currentNote);
                 }
 
             NavigateToBackPage();
@@ -69,11 +69,15 @@ namespace Notes
             {
                 NavigationService.GoBack();
             }
+            else
+            {
+                NavigationService.Navigate(new Uri("/MainPage.xaml", UriKind.RelativeOrAbsolute));
+            }
         }
 
         private void ApplicationBarDeleteIconButtonClick(object sender, EventArgs e)
         {
-            if (_collection != null) _collection.Delete(_currentNote);
+            if (_manager != null) _manager.Delete(_currentNote);
 
             NavigateToBackPage();
         }
@@ -86,7 +90,7 @@ namespace Notes
                 StandardTileData newTile = new StandardTileData()
                 {
                     Title = _currentNote.Title,
-                    BackgroundImage = new Uri("Icons/Appointment.png", UriKind.Relative),
+                    BackContent = _currentNote.Content
                 };
 
                 ShellTile.Create(NavigationService.Source, newTile);
@@ -103,9 +107,9 @@ namespace Notes
             if (NavigationContext.QueryString.TryGetValue("item", out item))
             {
                 //call get note;
-                if (_collection != null)
+                if (_manager != null)
                 {
-                    _currentNote = _collection.Retrieve(Convert.ToInt32(item));
+                    _currentNote = _manager.Retrieve(Convert.ToInt32(item));
                     //set node properties to the UI
                     if (_currentNote == null)
                     {
